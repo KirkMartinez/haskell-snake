@@ -85,7 +85,7 @@ initEnv = do
     let msgDir = MessageDir False 
 
     applePosition <- getRandomApple initialSnakePosition
-    tick <- getTicks
+    tick <- getTicks -- ms since SDL init (program start)
 
     return (AppConfig screen gameScreen msgDir,
             initialGameState {applePosition = applePosition
@@ -110,13 +110,17 @@ loop = do
 
         drawGame
 
+	let lvl = level gameState
         if checkCollision sp
-            then error "Game over"
+            then error $ "Game over.  You got to level " ++ show lvl ++ "."
             else return ()
 
         tick <- liftIO getTicks
 
-        if (tick - (lastSnakeMove gameState) > 500 - 10*(fromIntegral $ level gameState)) then
+	let initialDelay = 100 -- ms
+	let levelSpeedup = 10*(fromIntegral $ min (level gameState) 10)
+	let currentDelay = initialDelay - levelSpeedup
+        if (tick - (lastSnakeMove gameState) > currentDelay) then
             if snakeEatsApple sp ap
                 then do
                     newApplePosition <- liftIO $ getRandomApple (position (newSnakeState ss))
@@ -131,8 +135,8 @@ loop = do
 
         unless quit loop
     where
-        newSnakeState ss = initialSnakeState {
-                                len = ((len ss) + 1)}
+        newSnakeState ss = ss {
+                                len = ((len ss) + 1) }
         moveSnakeGameState gameState tick =
                         gameState{ snakeState = (moveSnake (snakeState gameState))
                                   ,lastSnakeMove = tick }

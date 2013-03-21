@@ -20,10 +20,10 @@ data Direction = North | South | East | West
 
 -- | board size
 numRectsX :: Int
-numRectsX     = 11
+numRectsX     = 100
 -- | board size
 numRectsY :: Int
-numRectsY     = 11
+numRectsY     = 100
 
 oppositeDirections :: Direction -> Direction -> Bool
 oppositeDirections dir1 dir2

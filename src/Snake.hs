@@ -38,8 +38,8 @@ checkCollision snakePosition = outOfBoundary || selfCollision
                     selfCollision = (length (nub snakePosition)) /= (length snakePosition)
 
 -- | Starting position & body
-initialSnakePosition = [Point 6 6]
-initialSnakeState = SnakeState initialSnakePosition North 1
+initialSnakePosition = [Point (numRectsX `div` 2) (numRectsY `div` 2)]
+initialSnakeState = SnakeState initialSnakePosition North 5 -- snake starts at length 5
 
 snakeEatsApple :: [Point] -> Point -> Bool
 snakeEatsApple snakePosition applePosition = applePosition `elem` snakePosition

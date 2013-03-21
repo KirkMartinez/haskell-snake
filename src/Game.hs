@@ -11,9 +11,9 @@ import Control.Monad.Reader
 import Graphics.UI.SDL as SDL
 
 screenWidth :: Int
-screenWidth   = 640
+screenWidth   = 1024
 screenHeight :: Int
-screenHeight  = 480
+screenHeight  = 1024
 screenBpp :: Int
 screenBpp     = 32
 gameScreenWidth :: Int
@@ -44,10 +44,10 @@ initialGameState = GameState {snakeState = initialSnakeState
 
 rectFromPoint :: Point -> Maybe Rect
 rectFromPoint (Point x y) = 
-                Just (Rect ((x - 1)*rectWidth + 1)
-                           ((y - 1)*rectHeight + 1)
-                           (rectWidth - 1)
-                           (rectHeight - 1))
+                Just (Rect ((x - 1)*rectWidth )
+                           ((y - 1)*rectHeight )
+                           (rectWidth )
+                           (rectHeight ))
 
 rects = [rectFromPoint (Point x y) | x <- [1..numRectsX], y <- [1..numRectsY]]
 
