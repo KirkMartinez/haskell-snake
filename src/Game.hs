@@ -30,6 +30,7 @@ rectHeight    = gameScreenHeight `div` numRectsY
 
 data GameState = GameState {
      snakeState         :: SnakeState,
+     enemySnakeState    :: SnakeState,
      applePosition      :: Point,
      board              :: Board,
      level              :: Int,
@@ -37,6 +38,7 @@ data GameState = GameState {
 }
 
 initialGameState = GameState {snakeState = initialSnakeState
+			     ,enemySnakeState = initialEnemySnakeState
                              ,applePosition = Point 0 0
                              ,board = initialBoard
                              ,level = 1
@@ -72,12 +74,13 @@ paintApple gameScreen applePosition = do
                        fillRect gameScreen (rectFromPoint applePosition) colorRed
                        return ()
 
-paintSnakePiece :: Surface -> Maybe Rect -> IO ()
-paintSnakePiece gameScreen rect = do
-                           colorGreen <- (mapRGB . surfaceGetPixelFormat) gameScreen 0x00 0xff 0x00
-                           fillRect gameScreen rect colorGreen
+paintSnakePiece :: Surface -> Color -> Maybe Rect -> IO ()
+paintSnakePiece gameScreen color rect = do
+                           theColor <- (mapRGB . surfaceGetPixelFormat) gameScreen (colorRed color) (colorGreen color) (colorBlue color)
+                           fillRect gameScreen rect theColor
                            return ()
 
-paintSnake :: Surface -> SnakeState -> IO ()
-paintSnake gameScreen snakeState =
-                      mapM_ (paintSnakePiece gameScreen . rectFromPoint) (position snakeState)
+paintSnake :: Surface -> SnakeState -> Color -> IO ()
+paintSnake gameScreen snakeState color =
+                      mapM_ (paintSnakePiece gameScreen color . rectFromPoint) (position snakeState)
+

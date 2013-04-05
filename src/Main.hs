@@ -106,13 +106,18 @@ loop = do
         gameState <- get
         let ap = applePosition gameState
         let ss = snakeState gameState
+        let ess = enemySnakeState gameState
         let sp = position ss
+        let esp = position ess
 
         drawGame
 
-	let lvl = level gameState
+        let levelReached = "You got to level " ++ show (level gameState) ++ "."
         if checkCollision sp
-            then error $ "Game over.  You got to level " ++ show lvl ++ "."
+            then error $ "Game over.  You hit yourself or left the playing field.  " ++ levelReached
+            else return ()
+	if checkEnemyCollision sp esp
+	    then error $ "Game over.  You hit (or were hit by) an enemy snake!  " ++ levelReached
             else return ()
 
         tick <- liftIO getTicks
@@ -127,6 +132,7 @@ loop = do
                     -- start new level after apple is eaten
                     put initialGameState {
                             snakeState = newSnakeState ss
+                           ,enemySnakeState = newSnakeState ess
                            ,applePosition = newApplePosition
                            ,level = (level gameState) + 1}
                     
@@ -137,8 +143,10 @@ loop = do
     where
         newSnakeState ss = ss {
                                 len = ((len ss) + 1) }
+			       
         moveSnakeGameState gameState tick =
                         gameState{ snakeState = (moveSnake (snakeState gameState))
+				  ,enemySnakeState = (moveSnake (snakeAI (enemySnakeState gameState)))
                                   ,lastSnakeMove = tick }
 
 drawGame = do
@@ -149,7 +157,8 @@ drawGame = do
     liftIO $ do
         paintBoard gameScreen
         paintApple gameScreen (applePosition gameState)
-        paintSnake gameScreen (snakeState gameState)
+        paintSnake gameScreen (snakeState gameState) (Color 0x00 0xff 0x00)
+        paintSnake gameScreen (enemySnakeState gameState) (Color 0xdd 0x00 0xdd)
 
         blitSurface gameScreen Nothing screen Nothing
 
